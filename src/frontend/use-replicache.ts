@@ -48,12 +48,12 @@ export function useReplicache<M extends MutatorDefs>({
     // - https://doc.replicache.dev/how-it-works#poke-optional
     // - https://github.com/supabase/realtime
     // - https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
-    const cancelReceiver = getPokeReceiver()(name, async () => r.pull());
+    const cancelReceiver = getPokeReceiver()(name, () => r.pull());
     setRep(r);
 
     return () => {
       cancelReceiver();
-      void r.close();
+      r.close();
     };
   }, [name, ...Object.values(options)]);
 
