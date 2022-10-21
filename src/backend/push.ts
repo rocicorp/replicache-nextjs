@@ -7,7 +7,6 @@ import {
 } from "./data.js";
 import { ReplicacheTransaction } from "./replicache-transaction.js";
 import { z, ZodType } from "zod";
-import { getPokeBackend } from "./poke/poke.js";
 import type { MutatorDefs, ReadonlyJSONValue } from "replicache";
 
 const mutationSchema = z.object({
@@ -102,9 +101,6 @@ export async function push<M extends MutatorDefs>(
       setCookie(executor, spaceID, nextVersion),
       tx.flush(),
     ]);
-
-    const pokeBackend = getPokeBackend();
-    await pokeBackend.poke(spaceID);
   });
 
   console.log("Processed all mutations in", Date.now() - t0);

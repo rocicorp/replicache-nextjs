@@ -1,6 +1,6 @@
 import type { PGConfig } from "./pgconfig/pgconfig.js";
 import type { Executor } from "./pg.js";
-import { getPokeBackend } from "./poke/poke.js";
+import { getSupabaseServerConfig } from "./supabase.js";
 
 export async function createDatabase(executor: Executor, dbConfig: PGConfig) {
   console.log("creating database");
@@ -43,6 +43,10 @@ export async function createSchemaVersion1(executor: Executor) {
   await executor(`create index on entry (deleted)`);
   await executor(`create index on entry (version)`);
 
-  const pokeBackend = getPokeBackend();
-  await pokeBackend.initSchema(executor);
+  //setup supabase realtime for poke
+  if (getSupabaseServerConfig()) {
+    await executor(`alter publication supabase_realtime add table space`);
+    await executor(`alter publication supabase_realtime set
+      (publish = 'insert, update, delete');`);
+  }
 }
