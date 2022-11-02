@@ -34,13 +34,13 @@ function supabaseReceiver(
   const { url, key } = supabaseClientConfig;
   const supabase = createClient(url, key);
   const subscription = supabase
-    .from(`space:id=eq.${spaceID}`)
-    .on("*", async () => {
+    .channel(`space:id=eq.${spaceID}`)
+    .on("postgres_changes", { event: "*", schema: "*", table: "space" }, async () => {
       await onPoke();
     })
     .subscribe();
   return () => {
-    subscription.unsubscribe();
+    void supabase.removeChannel(subscription);
   };
 }
 
