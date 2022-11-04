@@ -17,19 +17,19 @@ export async function createSchemaVersion1(executor: Executor) {
   await executor("create table meta (key text primary key, value json)");
   await executor("insert into meta (key, value) values ('schemaVersion', '1')");
 
-  await executor(`create table space (
+  await executor(`create table replicache_space (
         id text primary key not null,
         version integer not null,
         lastmodified timestamp(6) not null
         )`);
 
-  await executor(`create table client (
+  await executor(`create table replicache_client (
           id text primary key not null,
           lastmutationid integer not null,
           lastmodified timestamp(6) not null
           )`);
 
-  await executor(`create table entry (
+  await executor(`create replicache_table entry (
         spaceid text not null,
         key text not null,
         value text not null,
@@ -38,10 +38,10 @@ export async function createSchemaVersion1(executor: Executor) {
         lastmodified timestamp(6) not null
         )`);
 
-  await executor(`create unique index on entry (spaceid, key)`);
-  await executor(`create index on entry (spaceid)`);
-  await executor(`create index on entry (deleted)`);
-  await executor(`create index on entry (version)`);
+  await executor(`create unique index on replicache_entry (spaceid, key)`);
+  await executor(`create index on replicache_entry (spaceid)`);
+  await executor(`create index on replicache_entry (deleted)`);
+  await executor(`create index on replicache_entry (version)`);
 
   const pokeBackend = getPokeBackend();
   await pokeBackend.initSchema(executor);

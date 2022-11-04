@@ -48,10 +48,10 @@ test("getEntry", async () => {
 
   await withExecutor(async (executor) => {
     for (const c of cases) {
-      await executor(`delete from entry where spaceid = 's1' and key = 'foo'`);
+      await executor(`delete from replicache_entry where spaceid = 's1' and key = 'foo'`);
       if (c.exists) {
         await executor(
-          `insert into entry (spaceid, key, value, deleted, version, lastmodified) values ('s1', 'foo', $1, $2, 1, now())`,
+          `insert into replicache_entry (spaceid, key, value, deleted, version, lastmodified) values ('s1', 'foo', $1, $2, 1, now())`,
           [c.validJSON ? JSON.stringify(42) : "not json", c.deleted]
         );
       }
@@ -99,7 +99,7 @@ test("getEntry RoundTrip types", async () => {
 
 test("getEntries", async () => {
   await withExecutor(async (executor) => {
-    await executor(`delete from entry where spaceid = 's1'`);
+    await executor(`delete from replicache_entry where spaceid = 's1'`);
     await putEntry(executor, "s1", "foo", "foo", 1);
     await putEntry(executor, "s1", "bar", "bar", 1);
     await putEntry(executor, "s1", "baz", "baz", 1);
@@ -182,7 +182,7 @@ test("putEntry", async () => {
 
   await withExecutor(async (executor) => {
     for (const c of cases) {
-      await executor(`delete from entry where spaceid = 's1' and key = 'foo'`);
+      await executor(`delete from replicache_entry where spaceid = 's1' and key = 'foo'`);
 
       let res: Promise<void>;
       if (c.duplicate) {
@@ -198,7 +198,7 @@ test("putEntry", async () => {
 
       const qr = await executor(
         `select spaceid, key, value, deleted, version
-        from entry where spaceid = 's1' and key = 'foo'`
+        from replicache_entry where spaceid = 's1' and key = 'foo'`
       );
       const [row] = qr.rows;
 
@@ -230,10 +230,10 @@ test("delEntry", async () => {
   ];
   for (const c of cases) {
     await withExecutor(async (executor) => {
-      await executor(`delete from entry where spaceid = 's1' and key = 'foo'`);
+      await executor(`delete from replicache_entry where spaceid = 's1' and key = 'foo'`);
       if (c.exists) {
         await executor(
-          `insert into entry (spaceid, key, value, deleted, version, lastmodified) values ('s1', 'foo', '42', false, 1, now())`
+          `insert into replicache_entry (spaceid, key, value, deleted, version, lastmodified) values ('s1', 'foo', '42', false, 1, now())`
         );
       }
 
@@ -244,7 +244,7 @@ test("delEntry", async () => {
       );
 
       const qr = await executor(
-        `select spaceid, key, value, deleted, version from entry where spaceid = 's1' and key = 'foo'`
+        `select spaceid, key, value, deleted, version from replicache_entry where spaceid = 's1' and key = 'foo'`
       );
       const [row] = qr.rows;
 
@@ -281,7 +281,7 @@ test("createSpace", async () => {
   ];
   for (const c of cases) {
     await withExecutor(async (executor) => {
-      await executor(`delete from space where id = 'foo'`);
+      await executor(`delete from replicache_space where id = 'foo'`);
       if (c.exists) {
         await createSpace(executor, "foo");
         await setCookie(executor, "foo", 42);
@@ -297,7 +297,7 @@ test("createSpace", async () => {
         expect(c.exists).true;
       }
 
-      const res = await executor(`select * from space where id = 'foo'`);
+      const res = await executor(`select * from replicache_space where id = 'foo'`);
       expect(res.rowCount).eq(1);
       const [row] = res.rows;
       if (c.exists) {
@@ -334,7 +334,7 @@ test("getCookie", async () => {
   ];
   for (const c of cases) {
     await withExecutor(async (executor) => {
-      await executor(`delete from space where id = 'foo'`);
+      await executor(`delete from replicache_space where id = 'foo'`);
       if (c.exists) {
         await createSpace(executor, "foo");
         await setCookie(executor, "foo", 42);
