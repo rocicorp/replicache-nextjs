@@ -29,7 +29,7 @@ export async function createSchemaVersion1(executor: Executor) {
           lastmodified timestamp(6) not null
           )`);
 
-  await executor(`create replicache_table entry (
+  await executor(`create table replicache_entry (
         spaceid text not null,
         key text not null,
         value text not null,
