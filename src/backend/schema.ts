@@ -14,8 +14,8 @@ export async function createDatabase(executor: Executor, dbConfig: PGConfig) {
 }
 
 export async function createSchemaVersion1(executor: Executor) {
-  await executor("create table meta (key text primary key, value json)");
-  await executor("insert into meta (key, value) values ('schemaVersion', '1')");
+  await executor("create table replicache_meta (key text primary key, value json)");
+  await executor("insert into replicache_meta (key, value) values ('schemaVersion', '1')");
 
   await executor(`create table replicache_space (
         id text primary key not null,
