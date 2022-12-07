@@ -8,7 +8,7 @@ export async function getEntry(
   key: string
 ): Promise<JSONValue | undefined> {
   const { rows } = await executor(
-    "select value from entry where spaceid = $1 and key = $2 and deleted = false",
+    "select value from replicache_entry where spaceid = $1 and key = $2 and deleted = false",
     [spaceid, key]
   );
   const value = rows[0]?.value;
@@ -27,7 +27,7 @@ export async function putEntry(
 ): Promise<void> {
   await executor(
     `
-    insert into entry (spaceid, key, value, deleted, version, lastmodified)
+    insert into replicache_entry (spaceid, key, value, deleted, version, lastmodified)
     values ($1, $2, $3, false, $4, now())
       on conflict (spaceid, key) do update set
         value = $3, deleted = false, version = $4, lastmodified = now()
@@ -43,7 +43,7 @@ export async function delEntry(
   version: number
 ): Promise<void> {
   await executor(
-    `update entry set deleted = true, version = $3 where spaceid = $1 and key = $2`,
+    `update replicache_entry set deleted = true, version = $3 where spaceid = $1 and key = $2`,
     [spaceID, key, version]
   );
 }
@@ -54,7 +54,7 @@ export async function* getEntries(
   fromKey: string
 ): AsyncIterable<readonly [string, JSONValue]> {
   const { rows } = await executor(
-    `select key, value from entry where spaceid = $1 and key >= $2 and deleted = false order by key`,
+    `select key, value from replicache_entry where spaceid = $1 and key >= $2 and deleted = false order by key`,
     [spaceID, fromKey]
   );
   for (const row of rows) {
@@ -68,7 +68,7 @@ export async function getChangedEntries(
   prevVersion: number
 ): Promise<[key: string, value: JSONValue, deleted: boolean][]> {
   const { rows } = await executor(
-    `select key, value, deleted from entry where spaceid = $1 and version > $2`,
+    `select key, value, deleted from replicache_entry where spaceid = $1 and version > $2`,
     [spaceID, prevVersion]
   );
   return rows.map((row) => [row.key, JSON.parse(row.value), row.deleted]);
@@ -80,7 +80,7 @@ export async function createSpace(
 ): Promise<void> {
   console.log("creating space", spaceID);
   await executor(
-    `insert into space (id, version, lastmodified) values ($1, 0, now())`,
+    `insert into replicache_space (id, version, lastmodified) values ($1, 0, now())`,
     [spaceID]
   );
 }
@@ -89,7 +89,7 @@ export async function getCookie(
   executor: Executor,
   spaceID: string
 ): Promise<number | undefined> {
-  const { rows } = await executor(`select version from space where id = $1`, [
+  const { rows } = await executor(`select version from replicache_space where id = $1`, [
     spaceID,
   ]);
   const value = rows[0]?.version;
@@ -105,7 +105,7 @@ export async function setCookie(
   version: number
 ): Promise<void> {
   await executor(
-    `update space set version = $2, lastmodified = now() where id = $1`,
+    `update replicache_space set version = $2, lastmodified = now() where id = $1`,
     [spaceID, version]
   );
 }
@@ -115,7 +115,7 @@ export async function getLastMutationID(
   clientID: string
 ): Promise<number | undefined> {
   const { rows } = await executor(
-    `select lastmutationid from client where id = $1`,
+    `select lastmutationid from replicache_client where id = $1`,
     [clientID]
   );
   const value = rows[0]?.lastmutationid;
@@ -132,7 +132,7 @@ export async function setLastMutationID(
 ): Promise<void> {
   await executor(
     `
-    insert into client (id, lastmutationid, lastmodified)
+    insert into replicache_client (id, lastmutationid, lastmodified)
     values ($1, $2, now())
       on conflict (id) do update set lastmutationid = $2, lastmodified = now()
     `,

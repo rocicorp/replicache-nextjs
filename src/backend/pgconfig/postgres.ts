@@ -28,12 +28,12 @@ export class PostgresDBConfig implements PGConfig {
 
   async getSchemaVersion(executor: Executor): Promise<number> {
     const metaExists = await executor(`select exists(
-        select from pg_tables where schemaname = 'public' and tablename = 'meta')`);
+        select from pg_tables where schemaname = 'public' and tablename = 'replicache_meta')`);
     if (!metaExists.rows[0].exists) {
       return 0;
     }
     const qr = await executor(
-      `select value from meta where key = 'schemaVersion'`
+      `select value from replicache_meta where key = 'schemaVersion'`
     );
     return qr.rows[0].value;
   }

@@ -1,6 +1,6 @@
 {
   "name": "replicache-nextjs",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Generic Replicache backend on Next.js",
   "homepage": "https://github.com/rocicorp/replicache-nextjs",
   "repository": "github:rocicorp/replicache-nextjs",
@@ -10,7 +10,7 @@
     "check-format": "prettier --check 'src/**/*.{js,jsx,json,ts,tsx,html,css,md}'",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx src/",
     "check-types": "tsc --noEmit",
-    "build": "rm -rf lib && tsc",
+    "build": "rimraf lib && tsc",
     "prepack": "npm run lint && npm run build",
     "pretest": "npm run build",
     "test": "mocha --ui=tdd 'lib/**/*.test.js'"
@@ -43,6 +43,7 @@
     "eslint": "^8.2.0",
     "mocha": "^9.2.1",
     "prettier": "^2.2.1",
+    "rimraf": "^3.0.2", 
     "ts-node": "^10.7.0",
     "typescript": "^4.8.4"
   },
