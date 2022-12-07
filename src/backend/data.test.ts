@@ -292,7 +292,7 @@ test("createSpace", async () => {
         expect(c.exists).false;
       } catch (e) {
         expect(String(e)).contains(
-          `duplicate key value violates unique constraint "space_pkey`
+          `duplicate key value violates unique constraint "replicache_space_pkey`
         );
         expect(c.exists).true;
       }
